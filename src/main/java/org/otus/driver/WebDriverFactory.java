@@ -1,6 +1,7 @@
 package org.otus.driver;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -8,24 +9,43 @@ import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.opera.OperaDriver;
 import org.openqa.selenium.opera.OperaOptions;
 import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Locale;
+import java.util.Random;
 
 public class WebDriverFactory {
     private final String browser = System.getProperty("browser").toLowerCase(Locale.ROOT);
 
-    public EventFiringWebDriver getDriver() {
+    public WebDriver getDriver() {
         switch (browser) {
             case "chrome": {
-                ChromeOptions options = new ChromeOptions();
-                options.addArguments("--no-sandbox");
-                options.addArguments("--homepage=about:blank");
-                options.addArguments("--ignore-certificate-errors");
-                options.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-                options.setCapability("enableVNC", Boolean.parseBoolean(System.getProperty("enableVNC", "false")));
-                WebDriverManager.chromedriver().setup();
-                return new EventFiringWebDriver(new ChromeDriver(options));
+                if (System.getProperty("web.driver").equalsIgnoreCase("LOCAL")) {
+                    ChromeOptions options = new ChromeOptions();
+                    options.addArguments("--no-sandbox");
+                    options.addArguments("--homepage=about:blank");
+                    options.addArguments("--ignore-certificate-errors");
+                    options.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+                    options.setCapability("enableVNC", Boolean.parseBoolean(System.getProperty("enableVNC", "false")));
+                    WebDriverManager.chromedriver().setup();
+                    return new EventFiringWebDriver(new ChromeDriver(options));
+                } else {
+                    DesiredCapabilities capabilities = new DesiredCapabilities();
+                    capabilities.setCapability("browserName", "chrome");
+                    capabilities.setCapability("enableVNC", true);
+                    double dd = new Random().nextInt(7) / 2.0;
+                    String ver = (dd - (int) dd) == 0 ? "110.0" : "112.0";
+                    capabilities.setCapability("browserVersion", ver);
+                    try {
+                        return new RemoteWebDriver(new URL(System.getProperty("selenoid.url")), capabilities);
+                    } catch (MalformedURLException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
             case "firefox": {
                 FirefoxOptions options = new FirefoxOptions();

@@ -1,5 +1,6 @@
 package org.otus.components;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
 
 public class BannersCourses extends BaseComponentAbs {
     private WebElement currentBunner;
-    @FindBy(xpath = "//a[@href and contains(@class, 'lessons')]")
+    @FindBy(xpath = "//a[contains(@href, 'https://otus.ru/lessons/')]")
     private List<WebElement> listBanner;
 
     public BannersCourses(WebDriver driver) {
@@ -79,7 +80,7 @@ public class BannersCourses extends BaseComponentAbs {
     }
 
     private String getTitle(WebElement webElement) {
-        String titleLocator = ".//div[contains(@class, 'title')]";
+        String titleLocator = ".//h5";
         List<WebElement> allElements = webElement.findElements(By.xpath(titleLocator));
         if (allElements != null && !allElements.isEmpty()) {
             return allElements.get(0).getText();
@@ -90,7 +91,7 @@ public class BannersCourses extends BaseComponentAbs {
 
     private LocalDate getDateBegin(WebElement webElement) {
         List<String> dateBlockLocatorList = Arrays.asList(".//div[contains(@class, 'new-item-bottom_spec')]/div[2]",
-                ".//div[contains(@class, 'start')]");
+                ".//div[contains(@class, 'start')]", ".//span");
         List<WebElement> allElements = null;
         for (String locator : dateBlockLocatorList) {
             allElements = webElement.findElements(By.xpath(locator));
@@ -101,7 +102,8 @@ public class BannersCourses extends BaseComponentAbs {
         if (allElements == null || allElements.isEmpty()) {
             throw new NoSuchElementException("Элемент в баннере не найден " + dateBlockLocatorList);
         }
-        String strDate = getDate(allElements.get(0).getText());
+        boolean one = allElements.size() < 4;
+        String strDate = getDate(allElements.get(one ? 1 : 0).getText());
         if (strDate.isEmpty()) {
             return null;
         }
@@ -131,7 +133,7 @@ public class BannersCourses extends BaseComponentAbs {
         pattern = Pattern.compile("^(\\D+) ([0-9]{4}) года");
         matcher = pattern.matcher(str);
         str = matcher.find() ? "1 " + matcher.group(1) + " " + matcher.group(2) : str + " " + LocalDate.now().getYear();
-        return str;
+        return StringUtils.isNumeric(str.substring(0, 1)) ? str : "1 " + str;
     }
 
     private enum Month {

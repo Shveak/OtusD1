@@ -18,20 +18,18 @@ import java.util.stream.Collectors;
 
 public class MyExtension implements BeforeEachCallback, AfterEachCallback {
 
-    private EventFiringWebDriver driver;
+    private WebDriver driver;
 
     @Override
     public void afterEach(ExtensionContext context) throws Exception {
         if (driver != null) {
-            driver.close();
-            driver.quit();
+//            driver.close();
         }
     }
 
     @Override
     public void beforeEach(ExtensionContext context) throws Exception {
         driver = new WebDriverFactory().getDriver();
-        driver.register(new Mouse());
         getAnnotatedFields(Driver.class, context).forEach(x -> {
             if (x.getType().getName().equals(WebDriver.class.getName())) {
                 x.setAccessible(true);
