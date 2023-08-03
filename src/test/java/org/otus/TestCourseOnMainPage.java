@@ -3,30 +3,34 @@ package org.otus;
 import io.qameta.allure.Allure;
 import io.qameta.allure.model.Status;
 import io.qameta.allure.model.StepResult;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.otus.annotations.Driver;
 import org.otus.components.BannersCourses;
-import org.otus.extensions.MyExtension;
+import org.otus.driver.WebDriverFactory;
 import org.otus.pages.CoursePage;
 import org.otus.pages.MainPage;
 
 import java.util.UUID;
 
-@ExtendWith(MyExtension.class)
+//@ExtendWith(MyExtension.class)
 public class TestCourseOnMainPage {
     private static final String BASE_URL = System.getProperty("webdriver.base.url", "https://otus.ru");
 
     @Driver
     private WebDriver driver;
+    private MainPage mainPage;
 
     @BeforeEach
     public void before() {
-        new MainPage(driver).open(BASE_URL);
+        driver = new WebDriverFactory().getDriver();
+        mainPage = new MainPage(driver);
+        mainPage.open(BASE_URL);
+    }
+
+    @AfterEach
+    public void after() {
+        mainPage.close();
     }
 
     @Test
@@ -48,7 +52,7 @@ public class TestCourseOnMainPage {
         BannersCourses bannersCourses = new BannersCourses(driver).selectCourseWithMaxDateBegin();
         String titleCourse = bannersCourses.getTitleCurrentBanner();
         String dateBeginCourse = bannersCourses.getDateBeginCurrentBanner();
-        bannersCourses.click();
+//        bannersCourses.click();
 
         System.out.printf("Мах курс '%s', начало -> %s%n", titleCourse, dateBeginCourse);
         Allure.getLifecycle().startStep(UUID.randomUUID().toString(), (new StepResult()).setName("Мах курс: " + titleCourse).setStatus(Status.PASSED));

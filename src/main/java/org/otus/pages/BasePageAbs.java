@@ -12,4 +12,11 @@ public abstract class BasePageAbs extends Action {
     public void open(String url) {
         driver.get(url);
     }
+
+    public void close() {
+        if (driver != null) {
+            driver.close();
+            driver.quit();
+        }
+    }
 }
