@@ -24,6 +24,7 @@ public class MyExtension implements BeforeEachCallback, AfterEachCallback {
     public void afterEach(ExtensionContext context) throws Exception {
         if (driver != null) {
 //            driver.close();
+//            driver.quit();
         }
     }
 

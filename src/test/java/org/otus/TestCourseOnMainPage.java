@@ -1,6 +1,12 @@
 package org.otus;
 
-import org.junit.jupiter.api.*;
+import io.qameta.allure.Allure;
+import io.qameta.allure.model.Status;
+import io.qameta.allure.model.StepResult;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 import org.otus.annotations.Driver;
@@ -9,7 +15,7 @@ import org.otus.extensions.MyExtension;
 import org.otus.pages.CoursePage;
 import org.otus.pages.MainPage;
 
-import static java.lang.Thread.sleep;
+import java.util.UUID;
 
 @ExtendWith(MyExtension.class)
 public class TestCourseOnMainPage {
@@ -31,6 +37,7 @@ public class TestCourseOnMainPage {
         CoursePage coursePagePage = bannersCourses.click();
 
         System.out.printf("Открыта страница курса -> %s%n", coursePagePage.getTitle());
+        Allure.getLifecycle().startStep(UUID.randomUUID().toString(), (new StepResult()).setName("Cтраница курса: " + coursePagePage.getUrl()).setStatus(Status.PASSED));
 
         Assertions.assertTrue(coursePagePage.getUrl().contains(url), "Страница курса выбрана не верно");
     }
@@ -44,6 +51,8 @@ public class TestCourseOnMainPage {
         bannersCourses.click();
 
         System.out.printf("Мах курс '%s', начало -> %s%n", titleCourse, dateBeginCourse);
+        Allure.getLifecycle().startStep(UUID.randomUUID().toString(), (new StepResult()).setName("Мах курс: " + titleCourse).setStatus(Status.PASSED));
+        Allure.getLifecycle().startStep(UUID.randomUUID().toString(), (new StepResult()).setName("Начало: " + dateBeginCourse).setStatus(Status.PASSED));
     }
 
     @Test
@@ -56,5 +65,7 @@ public class TestCourseOnMainPage {
         bannersCourses.click();
 
         System.out.printf("Мin курс '%s', начало -> %s%n", titleCourse, dateBeginCourse);
+        Allure.getLifecycle().startStep(UUID.randomUUID().toString(), (new StepResult()).setName("Мин курс: " + titleCourse).setStatus(Status.PASSED));
+        Allure.getLifecycle().startStep(UUID.randomUUID().toString(), (new StepResult()).setName("Начало: " + dateBeginCourse).setStatus(Status.PASSED));
     }
 }
